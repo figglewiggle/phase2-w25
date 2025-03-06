@@ -16,6 +16,7 @@ static struct {
     TokenType type;
 } keywords[] = {
     {"if", TOKEN_IF},
+    {"while", TOKEN_WHILE},
     {"int", TOKEN_INT},
     {"print", TOKEN_PRINT}
 };
@@ -70,6 +71,7 @@ void print_token(Token token) {
         case TOKEN_LBRACE:     printf("LBRACE"); break;
         case TOKEN_RBRACE:     printf("RBRACE"); break;
         case TOKEN_IF:         printf("IF"); break;
+        case TOKEN_WHILE:      printf("WHILE"); break;
         case TOKEN_INT:        printf("INT"); break;
         case TOKEN_PRINT:      printf("PRINT"); break;
         case TOKEN_EOF:        printf("EOF"); break;
