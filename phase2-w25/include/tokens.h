@@ -14,6 +14,7 @@ typedef enum {
     TOKEN_LBRACE,      // {
     TOKEN_RBRACE,      // }
     TOKEN_IF,          // if keyword
+    TOKEN_WHILE,       // while keyword
     TOKEN_INT,         // int keyword
     TOKEN_PRINT,       // print keyword
     TOKEN_ERROR
