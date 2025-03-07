@@ -113,7 +113,7 @@ static ASTNode *parse_expr_prec(int min_prec);
 
 
 // Parse if statement: if (x) {y}
-// UNFINISHED
+// UNTESTED
 static ASTNode *parse_if_statement(void)
 {
 
@@ -121,6 +121,7 @@ static ASTNode *parse_if_statement(void)
     ASTNode *node = create_node(AST_IF);
     advance();
 
+    // '('
     if (!match(TOKEN_LPAREN))
     {
         if (match(TOKEN_LBRACE))
@@ -132,10 +133,10 @@ static ASTNode *parse_if_statement(void)
         exit(1);
     }
 
-    // Waiting on parentheses logic
-
+    // Conditional expression (consumes '(' now)
     node->left = parse_expression();
 
+    // ')'
     if (!match(TOKEN_RPAREN))
     {
         if (match(TOKEN_RBRACE))
@@ -146,9 +147,10 @@ static ASTNode *parse_if_statement(void)
         parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
         exit(1);
     }
+    
+    advance();
 
-    // Waiting on parentheses logic
-
+    // '{'
     if (!match(TOKEN_LBRACE))
     {
         if (match(TOKEN_LPAREN))
@@ -160,15 +162,26 @@ static ASTNode *parse_if_statement(void)
         exit(1);
     }
 
-    node->right = parse_statement();
+    advance();
 
+    // Could be one or multiple statements; copied parse_program logic
+    ASTNode *then = create_node(AST_PROGRAM);
+    ASTNode *curr = then;
+    while (!match(TOKEN_RBRACE) && !match(TOKEN_EOF)) // must end at '}' or EOF
+    {
+        curr->left = parse_statement();
+        if (!match(TOKEN_RBRACE) && !match(TOKEN_EOF))
+        {
+            curr->right = create_node(AST_PROGRAM);
+            curr = curr->right;
+        }
+    }
+    
+    node->right = then;
+    
+    // '}' (Will have advanced to '}' or EOF by now)
     if (!match(TOKEN_RBRACE))
     {
-        if (match(TOKEN_RPAREN))
-        {
-            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
-            exit(1);
-        }
         parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
         exit(1);
     }
@@ -177,7 +190,7 @@ static ASTNode *parse_if_statement(void)
 }
 
 // Parse while statement: while (x) {y}
-// UNFINISHED
+// UNTESTED
 static ASTNode *parse_while_statement(void)
 {
 
@@ -185,6 +198,7 @@ static ASTNode *parse_while_statement(void)
     ASTNode *node = create_node(AST_WHILE);
     advance();
 
+    // '('
     if (!match(TOKEN_LPAREN))
     {
         if (match(TOKEN_LBRACE))
@@ -196,10 +210,10 @@ static ASTNode *parse_while_statement(void)
         exit(1);
     }
 
-    // Waiting on parentheses logic
-
+    // Conditional expression (consumes '(' now)
     node->left = parse_expression();
 
+    // ')'
     if (!match(TOKEN_RPAREN))
     {
         if (match(TOKEN_RBRACE))
@@ -210,9 +224,10 @@ static ASTNode *parse_while_statement(void)
         parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
         exit(1);
     }
+    
+    advance();
 
-    // Waiting on parentheses logic
-
+    // '{'
     if (!match(TOKEN_LBRACE))
     {
         if (match(TOKEN_LPAREN))
@@ -224,19 +239,30 @@ static ASTNode *parse_while_statement(void)
         exit(1);
     }
 
-    node->right = parse_statement();
+    advance();
 
+    // Could be one or multiple statements; copied parse_program logic
+    ASTNode *doing = create_node(AST_PROGRAM);
+    ASTNode *curr = then;
+    while (!match(TOKEN_RBRACE) && !match(TOKEN_EOF)) // must end at '}' or EOF
+    {
+        curr->left = parse_statement();
+        if (!match(TOKEN_RBRACE) && !match(TOKEN_EOF))
+        {
+            curr->right = create_node(AST_PROGRAM);
+            curr = curr->right;
+        }
+    }
+    
+    node->right = doing;
+    
+    // '}' (Will have advanced to '}' or EOF by now)
     if (!match(TOKEN_RBRACE))
     {
-        if (match(TOKEN_RPAREN))
-        {
-            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
-            exit(1);
-        }
         parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
         exit(1);
     }
-
+    
     advance();
     return node;
 }
@@ -302,10 +328,15 @@ static ASTNode *parse_statement(void)
     {
         return parse_assignment();
     }
-
+    else if (match(TOKEN_IF)) 
+    {
+        return parse_if_statement();
+    }
+    else if (match(TOKEN_WHILE)) 
+    {
+        return parse_while_statement();
+    }
     // TODO 4: Add cases for new statement types
-    // else if (match(TOKEN_IF)) return parse_if_statement();
-    // else if (match(TOKEN_WHILE)) return parse_while_statement();
     // else if (match(TOKEN_REPEAT)) return parse_repeat_statement();
     // else if (match(TOKEN_PRINT)) return parse_print_statement();
     // ...
@@ -361,7 +392,8 @@ static int get_precedence(Token token)
     if (token.type != TOKEN_OPERATOR)
         return -1;
     if (strcmp(token.lexeme, "==") == 0 || strcmp(token.lexeme, "!=") == 0 ||
-        strcmp(token.lexeme, "<") == 0 || strcmp(token.lexeme, ">") == 0)
+        strcmp(token.lexeme, "<") == 0 || strcmp(token.lexeme, ">") == 0 ||
+        strcmp(token.lexeme, "<=") == 0 || strcmp(token.lexeme, ">=") == 0)
         return 1;
     if (strcmp(token.lexeme, "+") == 0 || strcmp(token.lexeme, "-") == 0)
         return 2;
