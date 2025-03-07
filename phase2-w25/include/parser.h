@@ -13,7 +13,7 @@ typedef enum {
     AST_NUMBER,         // Number literal
     AST_IDENTIFIER,     // Variable name
     AST_IF,             // If statement
-    AST_WHILE,          // While statement
+    AST_WHILE          // While statement
     // TODO: Add more node types as needed
 } ASTNodeType;
 
@@ -23,7 +23,9 @@ typedef enum {
     PARSE_ERROR_MISSING_SEMICOLON,
     PARSE_ERROR_MISSING_IDENTIFIER,
     PARSE_ERROR_MISSING_EQUALS,
-    PARSE_ERROR_INVALID_EXPRESSION
+    PARSE_ERROR_INVALID_EXPRESSION,
+    PARSE_ERROR_MISSING_PARENTHESIS,
+    PARSE_ERROR_BAD_PARENTHESIS
 } ParseError;
 
 // AST Node structure
