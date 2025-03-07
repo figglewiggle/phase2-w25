@@ -21,13 +21,8 @@ static const char *source;
 
 static void parse_error(ParseError error, Token token)
 {
-    // TODO 2: Add more error types for:
-    // - Missing parentheses
-    // - Missing condition
-    // - Missing block braces
-    // - Invalid operator
-    // - Function call errors
-
+    // If your Token structure has a column field, you can enable the line below.
+    // printf("Parse Error at line %d, column %d: ", token.line, token.column);
     printf("Parse Error at line %d: ", token.line);
     switch (error)
     {
@@ -51,6 +46,18 @@ static void parse_error(ParseError error, Token token)
         break;
     case PARSE_ERROR_BAD_PARENTHESIS:
         printf("Expected alternative parenthesis for line ended '%s'\n", token.lexeme);
+        break;
+    case PARSE_ERROR_MISSING_CONDITION:
+        printf("Missing condition near '%s'\n", token.lexeme);
+        break;
+    case PARSE_ERROR_MISSING_BLOCK:
+        printf("Missing block braces near '%s'\n", token.lexeme);
+        break;
+    case PARSE_ERROR_INVALID_OPERATOR:
+        printf("Invalid operator '%s'\n", token.lexeme);
+        break;
+    case PARSE_ERROR_FUNCTION_CALL_ERROR:
+        printf("Function call error near '%s'\n", token.lexeme);
         break;
     default:
         printf("Unknown error\n");
