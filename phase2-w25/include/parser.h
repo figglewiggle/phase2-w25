@@ -12,6 +12,7 @@ typedef enum {
     AST_PRINT,          // Print statement
     AST_NUMBER,         // Number literal
     AST_IDENTIFIER,     // Variable name
+    AST_EVAL,           // Evaluation logic (if, while etc.)
     // TODO: Add more node types as needed
 } ASTNodeType;
 
