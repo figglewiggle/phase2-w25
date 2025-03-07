@@ -46,6 +46,12 @@ static void parse_error(ParseError error, Token token) {
         case PARSE_ERROR_INVALID_EXPRESSION:
             printf("Invalid expression after '%s'\n", token.lexeme);
             break;
+        case PARSE_ERROR_MISSING_PARENTHESIS:
+            printf("Expected parenthesis for line ended '%s'\n", token.lexeme);
+            break;
+        case PARSE_ERROR_BAD_PARENTHESIS:
+            printf("Expected alternative parenthesis for line ended '%s'\n", token.lexeme);
+            break;
         default:
             printf("Unknown error\n");
     }
@@ -95,6 +101,117 @@ static ASTNode *parse_statement(void);
 // static ASTNode* parse_factorial(void) { ... }
 
 static ASTNode *parse_expression(void);
+
+// Parse if statement: if (x) {y}
+// UNFINISHED
+static ASTNode* parse_if_statement(void) {
+
+    // the 'if' itself
+    ASTNode *node = create_node(AST_IF);
+    advance();
+    
+    if (!match(TOKEN_LPAREN)) {
+        if (match(TOKEN_LBRACE)) {
+            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
+            exit(1);
+        }
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    
+    // Waiting on parentheses logic
+    
+    node->left = parse_expression();
+
+    if (!match(TOKEN_RPAREN)) {
+        if (match(TOKEN_RBRACE)) {
+            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
+            exit(1);
+        }
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    
+    // Waiting on parentheses logic
+
+    if (!match(TOKEN_LBRACE)) {
+        if (match(TOKEN_LPAREN)) {
+            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
+            exit(1);
+        }
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    
+    node->right = parse_statement();
+
+    if (!match(TOKEN_RBRACE)) {
+        if (match(TOKEN_RPAREN)) {
+            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
+            exit(1);
+        }
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    advance();
+    return node;
+}
+
+// Parse while statement: while (x) {y}
+// UNFINISHED
+static ASTNode* parse_while_statement(void) {
+
+    // the 'while' itself
+    ASTNode *node = create_node(AST_WHILE);
+    advance();
+
+    if (!match(TOKEN_LPAREN)) {
+        if (match(TOKEN_LBRACE)) {
+            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
+            exit(1);
+        }
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    
+    // Waiting on parentheses logic
+    
+    node->left = parse_expression();
+
+    if (!match(TOKEN_RPAREN)) {
+        if (match(TOKEN_RBRACE)) {
+            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
+            exit(1);
+        }
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    
+    // Waiting on parentheses logic
+
+    if (!match(TOKEN_LBRACE)) {
+        if (match(TOKEN_LPAREN)) {
+            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
+            exit(1);
+        }
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    
+    node->right = parse_statement();
+
+    if (!match(TOKEN_RBRACE)) {
+        if (match(TOKEN_RPAREN)) {
+            parse_error(PARSE_ERROR_BAD_PARENTHESIS, current_token);
+            exit(1);
+        }
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    
+    advance();
+    return node;
+}
 
 // Parse variable declaration: int x;
 static ASTNode *parse_declaration(void) {
