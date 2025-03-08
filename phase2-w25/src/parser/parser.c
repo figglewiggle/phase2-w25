@@ -391,7 +391,6 @@ static ASTNode *parse_expression(void)
     else if (match(TOKEN_FACT))
     {
         node = parse_factorial();
-        advance();
     }
     else
     {
