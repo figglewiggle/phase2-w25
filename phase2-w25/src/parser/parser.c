@@ -22,8 +22,8 @@ static const char *source;
 static void parse_error(ParseError error, Token token)
 {
     // If your Token structure has a column field, you can enable the line below.
-    // printf("Parse Error at line %d, column %d: ", token.line, token.column);
-    printf("Parse Error at line %d: ", token.line);
+    printf("Parse Error at line %d, column %d: ", token.line, token.column);
+    // printf("Parse Error at line %d: ", token.line);
     switch (error)
     {
     case PARSE_ERROR_UNEXPECTED_TOKEN:
@@ -100,7 +100,7 @@ static void expect(TokenType type)
     else
     {
         parse_error(PARSE_ERROR_UNEXPECTED_TOKEN, current_token);
-        exit(1); // Or implement error recovery
+        //exit(1); // commented out to implement error recovery
     }
 }
 
@@ -283,7 +283,14 @@ static ASTNode *parse_declaration(void)
     if (!match(TOKEN_IDENTIFIER))
     {
         parse_error(PARSE_ERROR_MISSING_IDENTIFIER, current_token);
-        exit(1);
+        // << EDIT: Added error recovery: Skip tokens until a semicolon or EOF is encountered
+        while (!match(TOKEN_SEMICOLON) && current_token.type != TOKEN_EOF) {
+            advance();
+        }
+        if (match(TOKEN_SEMICOLON)) {
+            advance();
+        }
+        return NULL;
     }
 
     node->token = current_token;
@@ -292,7 +299,14 @@ static ASTNode *parse_declaration(void)
     if (!match(TOKEN_SEMICOLON))
     {
         parse_error(PARSE_ERROR_MISSING_SEMICOLON, current_token);
-        exit(1);
+        // << EDIT: Added error recovery: Skip tokens until a semicolon or EOF is encountered
+        while (!match(TOKEN_SEMICOLON) && current_token.type != TOKEN_EOF) {
+            advance();
+        }
+        if (match(TOKEN_SEMICOLON)) {
+            advance();
+        }
+        return node;
     }
     advance();
     return node;
@@ -309,7 +323,14 @@ static ASTNode *parse_assignment(void)
     if (!match(TOKEN_EQUALS))
     {
         parse_error(PARSE_ERROR_MISSING_EQUALS, current_token);
-        exit(1);
+        // << EDIT: Added error recovery: Skip tokens until a semicolon or EOF is encountered
+        while (!match(TOKEN_SEMICOLON) && current_token.type != TOKEN_EOF) {
+            advance();
+        }
+        if (match(TOKEN_SEMICOLON)) {
+            advance();
+        }
+        return NULL;
     }
     advance();
 
@@ -318,7 +339,14 @@ static ASTNode *parse_assignment(void)
     if (!match(TOKEN_SEMICOLON))
     {
         parse_error(PARSE_ERROR_MISSING_SEMICOLON, current_token);
-        exit(1);
+        // << EDIT: Added error recovery: Skip tokens until a semicolon or EOF is encountered
+        while (!match(TOKEN_SEMICOLON) && current_token.type != TOKEN_EOF) {
+            advance();
+        }
+        if (match(TOKEN_SEMICOLON)) {
+            advance();
+        }
+        return node;
     }
     advance();
     return node;

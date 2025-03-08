@@ -8,6 +8,7 @@
 #include "../../include/lexer.h"
 
 static int current_line = 1;
+static int current_column = 1; // Column tracking
 static char last_token_type = 'x';
 
 // Keywords table
@@ -30,8 +31,8 @@ static int is_keyword(const char* word) {
     return 0;
 }
 
-void print_error(ErrorType error, int line, const char* lexeme) {
-    printf("Lexical Error at line %d: ", line);
+void print_error(ErrorType error, int line, int column, const char* lexeme) {
+    printf("Lexical Error at line %d, column %d: ", line, column);
     switch(error) {
         case ERROR_INVALID_CHAR:
             printf("Invalid character '%s'\n", lexeme);
@@ -55,7 +56,7 @@ void print_error(ErrorType error, int line, const char* lexeme) {
 
 void print_token(Token token) {
     if (token.error != ERROR_NONE) {
-        print_error(token.error, token.line, token.lexeme);
+        print_error(token.error, token.line, token.column, token.lexeme);
         return;
     }
 
@@ -81,13 +82,17 @@ void print_token(Token token) {
 }
 
 Token get_next_token(const char* input, int* pos) {
-    Token token = {TOKEN_ERROR, "", current_line, ERROR_NONE};
+    Token token = {TOKEN_ERROR, "", current_line, current_column, ERROR_NONE};
     char c;
 
     // Skip whitespace and track line numbers
     while ((c = input[*pos]) != '\0' && (c == ' ' || c == '\n' || c == '\t')) {
         if (c == '\n') {
             current_line++;
+            current_column = 1; // Reset column on newline
+        } 
+        else {
+            current_column++; // Add 1 to column for whitespace
         }
         (*pos)++;
     }
@@ -98,6 +103,8 @@ Token get_next_token(const char* input, int* pos) {
         return token;
     }
 
+    int token_column = current_column;
+
     c = input[*pos];
 
     // Handle numbers
@@ -105,12 +112,14 @@ Token get_next_token(const char* input, int* pos) {
         int i = 0;
         do {
             token.lexeme[i++] = c;
+            current_column++; // Update column
             (*pos)++;
             c = input[*pos];
         } while (isdigit(c) && i < sizeof(token.lexeme) - 1);
 
         token.lexeme[i] = '\0';
         token.type = TOKEN_NUMBER;
+        token.column = token_column; // Assign starting column
         return token;
     }
 
@@ -119,6 +128,7 @@ Token get_next_token(const char* input, int* pos) {
         int i = 0;
         do {
             token.lexeme[i++] = c;
+            current_column++; // Update column
             (*pos)++;
             c = input[*pos];
         } while ((isalnum(c) || c == '_') && i < sizeof(token.lexeme) - 1);
@@ -132,11 +142,13 @@ Token get_next_token(const char* input, int* pos) {
         } else {
             token.type = TOKEN_IDENTIFIER;
         }
+        token.column = token_column;
         return token;
     }
 
     // Handle operators and delimiters
     (*pos)++;
+    token.column = token_column; // Assign starting column
     token.lexeme[0] = c;
     token.lexeme[1] = '\0';
 

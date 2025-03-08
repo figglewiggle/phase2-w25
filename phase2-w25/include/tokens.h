@@ -33,6 +33,7 @@ typedef struct {
     TokenType type;
     char lexeme[100];   // Actual text of the token
     int line;           // Line number in source file
+    int column;         // Added column tracking
     ErrorType error;    // Error type if any
 } Token;
 
