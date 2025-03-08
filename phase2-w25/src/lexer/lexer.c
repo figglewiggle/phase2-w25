@@ -154,6 +154,7 @@ Token get_next_token(const char* input, int* pos) {
     token.column = token_column; // Assign starting column
     token.lexeme[0] = c;
     token.lexeme[1] = '\0';
+    char d;
 
     switch(c) {
         case '+': case '-': case '*': case '/':
@@ -165,9 +166,11 @@ Token get_next_token(const char* input, int* pos) {
             last_token_type = 'o';
             break;
         case '=':
-            char d = input[*pos];
+            d = input[*pos];
             if (d == '='){
                 token.type = TOKEN_COMPARE;
+                token.lexeme[1] = d;
+                token.lexeme[2] = '\0';
                 (*pos)++;
                 current_column++; // Update column
                 break;
@@ -176,16 +179,20 @@ Token get_next_token(const char* input, int* pos) {
             break;
         case '<':
             token.type = TOKEN_COMPARE;
-            char d = input[*pos];
+            d = input[*pos];
             if (d == '='){
+                token.lexeme[1] = d;
+                token.lexeme[2] = '\0';
                 (*pos)++;
                 current_column++; // Update column
             }
             break;
         case '>':
             token.type = TOKEN_COMPARE;
-            char d = input[*pos];
+            d = input[*pos];
             if (d == '='){
+                token.lexeme[1] = d;
+                token.lexeme[2] = '\0';
                 (*pos)++;
                 current_column++; // Update column
             }
