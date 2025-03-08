@@ -482,7 +482,7 @@ static ASTNode *parse_expression(void)
 
 static int get_precedence(Token token)
 {
-    if ((token.type != TOKEN_OPERATOR) || (token.type != TOKEN_COMPARE))
+    if (token.type != TOKEN_OPERATOR && token.type != TOKEN_COMPARE)
         return -1;
     if (strcmp(token.lexeme, "==") == 0 || strcmp(token.lexeme, "!=") == 0 ||
         strcmp(token.lexeme, "<") == 0 || strcmp(token.lexeme, ">") == 0 ||
