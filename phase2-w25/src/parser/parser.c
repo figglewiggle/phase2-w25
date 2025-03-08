@@ -250,7 +250,7 @@ static ASTNode *parse_while_statement(void)
 
     // Could be one or multiple statements; copied parse_program logic
     ASTNode *doing = create_node(AST_PROGRAM);
-    ASTNode *curr = then;
+    ASTNode *curr = doing;
     while (!match(TOKEN_RBRACE) && !match(TOKEN_EOF)) // must end at '}' or EOF
     {
         curr->left = parse_statement();
