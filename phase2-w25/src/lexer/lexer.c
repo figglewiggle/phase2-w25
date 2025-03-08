@@ -18,7 +18,7 @@ static struct {
 } keywords[] = {
     {"if", TOKEN_IF},
     {"while", TOKEN_WHILE},
-    {"factorial", TOKEN_INT},
+    {"factorial", TOKEN_FACT},
     {"int", TOKEN_INT},
     {"print", TOKEN_PRINT}
 };
