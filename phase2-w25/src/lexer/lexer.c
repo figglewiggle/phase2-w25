@@ -18,6 +18,7 @@ static struct {
 } keywords[] = {
     {"if", TOKEN_IF},
     {"while", TOKEN_WHILE},
+    {"factorial", TOKEN_INT},
     {"int", TOKEN_INT},
     {"print", TOKEN_PRINT}
 };
@@ -66,6 +67,7 @@ void print_token(Token token) {
         case TOKEN_OPERATOR:   printf("OPERATOR"); break;
         case TOKEN_IDENTIFIER: printf("IDENTIFIER"); break;
         case TOKEN_EQUALS:     printf("EQUALS"); break;
+        case TOKEN_COMPARE:    printf("COMPARE"); break;
         case TOKEN_SEMICOLON:  printf("SEMICOLON"); break;
         case TOKEN_LPAREN:     printf("LPAREN"); break;
         case TOKEN_RPAREN:     printf("RPAREN"); break;
@@ -73,6 +75,7 @@ void print_token(Token token) {
         case TOKEN_RBRACE:     printf("RBRACE"); break;
         case TOKEN_IF:         printf("IF"); break;
         case TOKEN_WHILE:      printf("WHILE"); break;
+        case TOKEN_FACT:       printf("FACTORIAL"); break;
         case TOKEN_INT:        printf("INT"); break;
         case TOKEN_PRINT:      printf("PRINT"); break;
         case TOKEN_EOF:        printf("EOF"); break;
@@ -128,8 +131,8 @@ Token get_next_token(const char* input, int* pos) {
         int i = 0;
         do {
             token.lexeme[i++] = c;
-            current_column++; // Update column
             (*pos)++;
+            current_column++; // Update column
             c = input[*pos];
         } while ((isalnum(c) || c == '_') && i < sizeof(token.lexeme) - 1);
 
@@ -162,7 +165,30 @@ Token get_next_token(const char* input, int* pos) {
             last_token_type = 'o';
             break;
         case '=':
+            char d = input[*pos];
+            if (d == '='){
+                token.type = TOKEN_COMPARE;
+                (*pos)++;
+                current_column++; // Update column
+                break;
+            }
             token.type = TOKEN_EQUALS;
+            break;
+        case '<':
+            token.type = TOKEN_COMPARE;
+            char d = input[*pos];
+            if (d == '='){
+                (*pos)++;
+                current_column++; // Update column
+            }
+            break;
+        case '>':
+            token.type = TOKEN_COMPARE;
+            char d = input[*pos];
+            if (d == '='){
+                (*pos)++;
+                current_column++; // Update column
+            }
             break;
         case ';':
             token.type = TOKEN_SEMICOLON;

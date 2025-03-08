@@ -23,7 +23,7 @@ static void parse_error(ParseError error, Token token)
 {
     // If your Token structure has a column field, you can enable the line below.
     printf("Parse Error at line %d, column %d: ", token.line, token.column);
-    // printf("Parse Error at line %d: ", token.line);
+    //printf("Parse Error at line %d: ", token.line);
     switch (error)
     {
     case PARSE_ERROR_UNEXPECTED_TOKEN:
@@ -100,7 +100,7 @@ static void expect(TokenType type)
     else
     {
         parse_error(PARSE_ERROR_UNEXPECTED_TOKEN, current_token);
-        //exit(1); // commented out to implement error recovery
+        //exit(1); // Or implement error recovery
     }
 }
 
@@ -141,7 +141,8 @@ static ASTNode *parse_if_statement(void)
     }
 
     // Conditional expression (consumes '(' now)
-    node->left = parse_expression();
+    advance();
+    node->left = parse_expr_prec(0);
 
     // ')'
     if (!match(TOKEN_RPAREN))
@@ -274,6 +275,59 @@ static ASTNode *parse_while_statement(void)
     return node;
 }
 
+// Parse factorial function: factorial(x) 
+/*
+IMPORTANT: I asked Dr. Acharya in class whether the factorial function
+should recursively build out a parse tree like:
+
+           fac
+    /   /   |   \   \
+   (   id   *  fac   )
+        |   / / | \ \
+        x  ( id * fac )
+             |   //|\\
+            x-1
+
+... and so on until x == 1,
+or whether it could simply be 
+
+            fac
+          /  |  \
+          (  id  )
+             |
+             x
+
+With the multiplication being implied as the function's process.
+Dr. Acharya said the latter is sufficient. This code reflects that.
+*/
+static ASTNode *parse_factorial(void)
+{
+    ASTNode *node = create_node(AST_FACTORIAL);
+    advance(); // consume factorial
+
+    // '('
+    if (!match(TOKEN_LPAREN))
+    {
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    advance();
+
+    // 'x'
+    node->left = parse_expression();
+
+    // ')'
+    if (!match(TOKEN_RPAREN))
+    {
+        parse_error(PARSE_ERROR_MISSING_PARENTHESIS, current_token);
+        exit(1);
+    }
+    
+    advance();
+    return node;
+
+}
+
 // Parse variable declaration: int x;
 static ASTNode *parse_declaration(void)
 {
@@ -371,6 +425,10 @@ static ASTNode *parse_statement(void)
     {
         return parse_while_statement();
     }
+    else if (match(TOKEN_FACT))
+    {
+        return parse_factorial();
+    }
     // TODO 4: Add cases for new statement types
     // else if (match(TOKEN_REPEAT)) return parse_repeat_statement();
     // else if (match(TOKEN_PRINT)) return parse_print_statement();
@@ -398,7 +456,7 @@ static ASTNode *parse_expression(void)
         advance();
         node = parse_expr_prec(0);
         if (!match(TOKEN_RPAREN)) {
-            printf("Syntax Error: Expected ')'\n");
+            printf("Syntax Error: Expected ')' but found %s\n", node->token.lexeme);
             exit(1);
         }
         advance();
@@ -424,7 +482,7 @@ static ASTNode *parse_expression(void)
 
 static int get_precedence(Token token)
 {
-    if (token.type != TOKEN_OPERATOR)
+    if ((token.type != TOKEN_OPERATOR) || (token.type != TOKEN_COMPARE))
         return -1;
     if (strcmp(token.lexeme, "==") == 0 || strcmp(token.lexeme, "!=") == 0 ||
         strcmp(token.lexeme, "<") == 0 || strcmp(token.lexeme, ">") == 0 ||
@@ -442,7 +500,7 @@ static ASTNode *parse_expr_prec(int min_prec)
     
     ASTNode *left = parse_expression();
 
-    while (match(TOKEN_OPERATOR))
+    while (match(TOKEN_OPERATOR) || match(TOKEN_COMPARE))
     {
         int prec = get_precedence(current_token);
         if (prec < min_prec)
@@ -531,6 +589,9 @@ void print_ast(ASTNode *node, int level)
     // case AST_WHILE: printf("While\n"); break;
     // case AST_REPEAT: printf("Repeat-Until\n"); break;
     // case AST_BLOCK: printf("Block\n"); break;
+    case AST_FACTORIAL:
+        printf("Factorial of:\n");
+        break;
     case AST_BINOP:
         printf("BinaryOp: %s\n", node->token.lexeme);
         break;
@@ -558,14 +619,27 @@ int main()
 {
     // Test with both valid and invalid inputs
     const char *input = "int x;\n"   // Valid declaration
-                        "x = 42;\n"; // Valid assignment;
+                        "x = 42;\n" // Valid assignment;
+                        "if (x <= 42) {\n"
+                        "   y = 5;\n"
+                        "   z = 6;\n"
+                        "}\n";
+
+
     // TODO 8: Add more test cases and read from a file:
+    /*
     const char *invalid_input = "int x;\n"
                                 "x = 42;\n"
+                                "int x;\n"
+                                "x = 42;"
+                                "if (x == 42) {"
+                                "y = 5;"
+                                "z = 6;"
+                                "}"
                                 "int ;";
-
-    printf("Parsing input:\n%s\n", invalid_input);
-    parser_init(invalid_input);
+*/
+    printf("Parsing input:\n%s\n", input);
+    parser_init(input);
     ASTNode *ast = parse();
 
     printf("\nAbstract Syntax Tree:\n");

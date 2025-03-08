@@ -8,6 +8,7 @@ typedef enum {
     TOKEN_OPERATOR,    // +, -, *, /
     TOKEN_IDENTIFIER,  // Variable names
     TOKEN_EQUALS,      // =
+    TOKEN_COMPARE,     // <, <=, ==, >=, >
     TOKEN_SEMICOLON,   // ;
     TOKEN_LPAREN,      // (
     TOKEN_RPAREN,      // )
@@ -17,6 +18,7 @@ typedef enum {
     TOKEN_WHILE,       // while keyword
     TOKEN_INT,         // int keyword
     TOKEN_PRINT,       // print keyword
+    TOKEN_FACT,        // factorial keyword
     TOKEN_ERROR
 } TokenType;
 
@@ -33,7 +35,7 @@ typedef struct {
     TokenType type;
     char lexeme[100];   // Actual text of the token
     int line;           // Line number in source file
-    int column;         // Added column tracking
+    int column; // Added column tracking
     ErrorType error;    // Error type if any
 } Token;
 

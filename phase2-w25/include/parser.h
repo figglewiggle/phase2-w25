@@ -14,6 +14,7 @@ typedef enum {
     AST_IDENTIFIER,     // Variable name
     AST_IF,             // If statement
     AST_WHILE,          // While statement
+    AST_FACTORIAL,      // Factorial function
     AST_BINOP           // Binary operator
     // TODO: Add more node types as needed
 } ASTNodeType;
