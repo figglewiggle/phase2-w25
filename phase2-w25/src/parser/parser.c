@@ -116,11 +116,10 @@ static ASTNode *parse_statement(void);
 // TODO 3: Add parsing functions for each new statement type
 static ASTNode* parse_if_statement(void);
 static ASTNode* parse_while_statement(void);
-// static ASTNode* parse_repeat_statement(void) { ... }
-// static ASTNode* parse_print_statement(void) { ... }
+static ASTNode* parse_repeat_statement(void);
+static ASTNode* parse_print_statement(void);
 static ASTNode* parse_block(void);// { ... }
-// static ASTNode* parse_factorial(void) { ... }
-
+static ASTNode* parse_factorial(void);
 static ASTNode *parse_expression(void);
 static ASTNode *parse_expr_prec(int min_prec);
 
@@ -351,6 +350,28 @@ static ASTNode *parse_assignment(void)
     return node;
 }
 
+// Parse print statements
+static ASTNode *parse_print_statement(void) {
+    ASTNode *node = create_node(AST_PRINT);
+    advance(); // consume the 'print' keyword
+    node->left = parse_expression();
+    if (!match(TOKEN_SEMICOLON))
+    {
+        parse_error(PARSE_ERROR_MISSING_SEMICOLON, current_token);
+        // << EDIT: Added error recovery: Skip tokens until a semicolon or EOF is encountered
+        while (!match(TOKEN_SEMICOLON) && current_token.type != TOKEN_EOF) {
+            advance();
+        }
+        if (match(TOKEN_SEMICOLON)) {
+            advance();
+        }
+        return node;
+    }
+    advance();
+    return node;
+}
+
+
 // Parse statement
 static ASTNode *parse_statement(void)
 {
@@ -377,6 +398,10 @@ static ASTNode *parse_statement(void)
     else if (match(TOKEN_REPEAT))
     {
         return parse_repeat_statement();
+    }
+    else if (match(TOKEN_PRINT))
+    {
+        return parse_print_statement();
     }
     // TODO 4: Add cases for new statement types
     // else if (match(TOKEN_REPEAT)) return parse_repeat_statement();
@@ -424,6 +449,10 @@ static ASTNode *parse_expression(void)
     {
         node = parse_factorial();
     }
+    else if (match(TOKEN_PRINT))
+    {
+        node = parse_print_statement();
+    }
     else
     {
         printf("Syntax Error: Expected expression\n");
@@ -450,7 +479,6 @@ static int get_precedence(Token token)
 
 static ASTNode *parse_expr_prec(int min_prec)
 {
-    
     ASTNode *left = parse_expression();
 
     while (match(TOKEN_OPERATOR) || match(TOKEN_COMPARE))
@@ -542,6 +570,7 @@ void print_ast(ASTNode *node, int level)
     case AST_WHILE: printf("While\n"); break;
     case AST_REPEAT: printf("Repeat-Until\n"); break;
     case AST_BLOCK: printf("Block\n"); break;
+    case AST_PRINT: printf("Print\n"); break;
     case AST_FACTORIAL:
         printf("Factorial of:\n");
         break;
@@ -567,6 +596,9 @@ void free_ast(ASTNode *node)
     free(node);
 }
 
+void test_case_1(void);
+void test_case_2(void);
+
 // Main function for testing
 int main()
 {
@@ -588,9 +620,9 @@ int main()
                         "   y = y + 2;\n"
                         "   x = x + 3;\n"
                         "} until (x > 10) \n";
-                        //"a = factorial(z - 1);\n"
-                        //"y = (x + 2) * 3;\n";
-                        
+    //"a = factorial(z - 1);\n"
+    //"y = (x + 2) * 3;\n";
+
 
 
     // TODO 8: Add more test cases and read from a file:
@@ -613,5 +645,36 @@ int main()
     print_ast(ast, 0);
 
     free_ast(ast);
+
+    test_case_1();
+    test_case_2();
     return 0;
+}
+
+void test_case_1(void) {
+    // Valid case
+    printf("\nTest case 1:\n");
+    const char *input = "int x;\n x = 10;\n print x; if (x > 4) { x = 5; }";
+    printf("Parsing input:\n%s\n", input);
+    parser_init(input);
+    ASTNode *ast = parse();
+
+    printf("\nAbstract Syntax Tree:\n");
+    print_ast(ast, 0);
+
+    free_ast(ast);
+}
+
+void test_case_2(void) {
+    // Invalid case
+    printf("\nTest case 2:\n");
+    const char *input = "int x; print x + ;";
+    printf("Parsing input:\n%s\n", input);
+    parser_init(input);
+    ASTNode *ast = parse();
+
+    printf("\nAbstract Syntax Tree:\n");
+    print_ast(ast, 0);
+
+    free_ast(ast);
 }
