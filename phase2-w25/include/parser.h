@@ -15,8 +15,9 @@ typedef enum {
     AST_IF,             // If statement
     AST_WHILE,          // While statement
     AST_FACTORIAL,      // Factorial function
-    AST_BINOP,           // Binary operator
-    AST_BLOCK
+    AST_BINOP,          // Binary operator
+    AST_BLOCK,          // {} blocks
+    AST_REPEAT          // Repeat statement
     // TODO: Add more node types as needed
 } ASTNodeType;
 

@@ -19,7 +19,9 @@ typedef enum {
     TOKEN_INT,         // int keyword
     TOKEN_PRINT,       // print keyword
     TOKEN_FACT,        // factorial keyword
-    TOKEN_ERROR
+    TOKEN_REPEAT,      // repeat keyword
+    TOKEN_UNTIL,       // until keyword
+    TOKEN_ERROR        // error
 } TokenType;
 
 typedef enum {

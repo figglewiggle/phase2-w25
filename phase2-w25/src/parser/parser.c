@@ -175,11 +175,9 @@ or whether it could simply be
 
             fac
           /  |  \
-          (  id  )
-             |
-             x
+          (  x  )
 
-With the multiplication being implied as the function's process.
+... with the multiplication being implied as the function's process.
 Dr. Acharya said the latter is sufficient. This code reflects that.
 */
 static ASTNode *parse_factorial(void)
@@ -210,7 +208,33 @@ static ASTNode *parse_factorial(void)
 
 }
 
-static ASTNode *parse_block(void) {
+// parse 'repeat {x} until (y)'
+static ASTNode *parse_repeat_statement(void)
+{
+    // 'repeat'
+    ASTNode *node = create_node(AST_REPEAT);
+    advance();
+
+    // '{statements}'
+    node->left = parse_block();
+    
+    // 'until'
+    if (!match(TOKEN_UNTIL)) 
+    {
+        parse_error(PARSE_ERROR_UNEXPECTED_TOKEN, current_token);
+        exit(1);
+    }
+    advance(); 
+
+    // condition
+    node->right = parse_expr_prec(0);
+
+    return node;
+}
+
+// parse {code} blocks
+static ASTNode *parse_block(void) 
+{
     
     // `{`
     if (!match(TOKEN_LBRACE)) 
@@ -345,6 +369,10 @@ static ASTNode *parse_statement(void)
     else if (match(TOKEN_FACT))
     {
         return parse_factorial();
+    }
+    else if (match(TOKEN_REPEAT))
+    {
+        return parse_repeat_statement();
     }
     // TODO 4: Add cases for new statement types
     // else if (match(TOKEN_REPEAT)) return parse_repeat_statement();
@@ -508,7 +536,7 @@ void print_ast(ASTNode *node, int level)
     // TODO 6: Add cases for new node types
     case AST_IF: printf("If\n"); break;
     case AST_WHILE: printf("While\n"); break;
-    // case AST_REPEAT: printf("Repeat-Until\n"); break;
+    case AST_REPEAT: printf("Repeat-Until\n"); break;
     case AST_BLOCK: printf("Block\n"); break;
     case AST_FACTORIAL:
         printf("Factorial of:\n");
@@ -541,6 +569,9 @@ int main()
     // Test with both valid and invalid inputs
     const char *input = "int x;\n"   // Valid declaration
                         "x = 42;\n" // Valid assignment;
+
+                        // comment and uncomment out these lines at will
+                        // to see how valid and invalid output proceed
                         "if (x <= 42) {\n"
                         "   y = 5;\n"
                         "   z = 6;\n"
@@ -549,8 +580,12 @@ int main()
                         "   y = 6;\n"
                         "   x = z;\n"
                         "}\n"
+                        "repeat {\n"
+                        "   y = y + 2;\n"
+                        "   x = x + 3;\n"
+                        "} until (x > 10) \n";
                         //"a = factorial(z - 1);\n"
-                        "y = (x + 2) * 3;\n";
+                        //"y = (x + 2) * 3;\n";
                         
 
 
@@ -560,9 +595,9 @@ int main()
                                 "x = 42;\n"
                                 "int x;\n"
                                 "x = 42;"
-                                "if (x == 42) {"
-                                "y = 5;"
-                                "z = 6;"
+                                "if x == 42) {"
+                                "y = 5y;"
+                                "z = 6"
                                 "}"
                                 "int ;";
 */
