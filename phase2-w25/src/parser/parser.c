@@ -68,8 +68,9 @@ static void parse_error(ParseError error, Token token)
 static void advance(void)
 {
     current_token = get_next_token(source, &position);
-    printf("Token: %s (Type: %d, Line: %d, Column: %d)\n",
-           current_token.lexeme, current_token.type, current_token.line, current_token.column);
+    // For debugging purposes
+    //printf("Token: %s (Type: %d, Line: %d, Column: %d)\n",
+    //       current_token.lexeme, current_token.type, current_token.line, current_token.column);
 }
 
 // Create a new AST node
