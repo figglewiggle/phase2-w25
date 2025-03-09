@@ -305,7 +305,7 @@ static ASTNode *parse_assignment(void)
     }
     advance();
 
-    node->right = parse_expression();
+    node->right = parse_expr_prec(0);
 
     if (!match(TOKEN_SEMICOLON))
     {
