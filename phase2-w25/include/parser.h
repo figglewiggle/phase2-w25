@@ -33,7 +33,8 @@ typedef enum {
     PARSE_ERROR_MISSING_CONDITION,       // New error type
     PARSE_ERROR_MISSING_BLOCK,           // New error type
     PARSE_ERROR_INVALID_OPERATOR,        // New error type
-    PARSE_ERROR_FUNCTION_CALL_ERROR      // New error type
+    PARSE_ERROR_FUNCTION_CALL_ERROR,      // New error type
+    PARSE_ERROR_MISSING_UNTILS,          // New error type
 } ParseError;
 
 // AST Node structure

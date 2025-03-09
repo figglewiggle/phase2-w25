@@ -59,6 +59,9 @@ static void parse_error(ParseError error, Token token)
     case PARSE_ERROR_FUNCTION_CALL_ERROR:
         printf("Function call error near '%s'\n", token.lexeme);
         break;
+    case PARSE_ERROR_MISSING_UNTILS:
+        printf("Unexpected error near '%s', expected until\n", token.lexeme);
+        break;
     default:
         printf("Unknown error\n");
     }
@@ -222,7 +225,7 @@ static ASTNode *parse_repeat_statement(void)
     // 'until'
     if (!match(TOKEN_UNTIL)) 
     {
-        parse_error(PARSE_ERROR_UNEXPECTED_TOKEN, current_token);
+        parse_error(PARSE_ERROR_MISSING_UNTILS, current_token);
         exit(1);
     }
     advance(); 
