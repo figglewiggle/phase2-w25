@@ -17,4 +17,18 @@ typedef struct {
     int current_scope;       // Current scope level
 } SymbolTable;
 
+// Semantic errors
+typedef enum {
+    SEM_ERROR_NONE,
+    SEM_ERROR_UNDECLARED_VARIABLE,
+    SEM_ERROR_REDECLARED_VARIABLE,
+    SEM_ERROR_TYPE_MISMATCH,
+    SEM_ERROR_UNINITIALIZED_VARIABLE,
+    SEM_ERROR_INVALID_OPERATION,
+    SEM_ERROR_SEMANTIC_ERROR  // Generic semantic error
+} SemanticErrorType;
+
+// Report semantic errors
+void semantic_error(SemanticErrorType error, const char* name, int line);
+
 #endif /* SEMANTIC_H */
