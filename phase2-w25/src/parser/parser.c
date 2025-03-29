@@ -644,6 +644,15 @@ int main()
     printf("\nAbstract Syntax Tree:\n");
     print_ast(ast, 0);
 
+    // New: Perform semantic analysis after AST is created
+    printf("\nPerforming Semantic Analysis...\n");
+    int semanticResult = analyze_semantics(ast);
+    if (semanticResult) {
+        printf("Semantic analysis successful. No errors found.\n");
+    } else {
+        printf("Semantic analysis failed. Errors detected.\n");
+    }
+
     free_ast(ast);
 
     test_case_1();

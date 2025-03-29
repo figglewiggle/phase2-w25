@@ -19,35 +19,33 @@ SymbolTable* init_symbol_table(){
 // Add a symbol to the table
 // Inserts a new variable with given name, type, and line number into the current scope
 Symbol* add_symbol(SymbolTable* table, const char* name, int type, int line){
-    
-    // Does that symbol already exist?
-    Symbol *exists = lookup_symbol(table, name);
-    if (exists){
-        return; //REPLACE WITH APPROPRIATE ERROR
-    }
 
-    // If not, let's add it!
-    Symbol *new = malloc(sizeof(Symbol));
-    if (new){
-        strcpy(new->name, name);
-        new->type=type;
-        new->line_declared=line;
-    }
-
-    // Add to start of table if empty
-    if (!(table->head)){
-        table->head=new;
-        return new;
-    }
-
-    // Or end of table if not empty
+    // Check for redeclaration in the current scope
     Symbol *curr = table->head;
-    while (curr->next){
+    while (curr) {
+        if (strcmp(curr->name, name) == 0 && curr->scope_level == table->current_scope) {
+            semantic_error(SEM_ERROR_REDECLARED_VARIABLE, name, line);
+            return NULL; // Or handle the error appropriately
+        }
         curr = curr->next;
     }
-    curr->next=new;
 
-    return new;
+    // Create and initialize new symbol
+    Symbol *new_symbol = malloc(sizeof(Symbol));
+    if (new_symbol) {
+        strcpy(new_symbol->name, name);
+        new_symbol->type = type;
+        new_symbol->line_declared = line;
+        new_symbol->scope_level = table->current_scope; // Set current scope level
+        new_symbol->is_initialized = 0;
+        new_symbol->next = NULL;
+    }
+
+    // Insert at the beginning of the list (for easier shadowing lookup)
+    new_symbol->next = table->head;
+    table->head = new_symbol;
+
+    return new_symbol;
 }
 
 // Look up a symbol in the table
@@ -55,15 +53,9 @@ Symbol* add_symbol(SymbolTable* table, const char* name, int type, int line){
 // Returns the symbol if found, NULL otherwise
 Symbol* lookup_symbol(SymbolTable* table, const char* name){
     
-    // Is the table empty?
-    if (!(table->head)){
-        return NULL;
-    }
-
-    // If not, search the table
     Symbol *curr = table->head;
-    while (curr->next){
-        if (curr->name == name){
+    while (curr) {
+        if (strcmp(curr->name, name) == 0) {
             return curr;
         }
         curr = curr->next;
@@ -136,6 +128,39 @@ void remove_symbols_in_current_scope(SymbolTable* table){
     if (curr->scope_level == table->current_scope){
         prev->next=NULL;
         free(curr);
+    }
+}
+
+void analyze_scope(ASTNode *node, SymbolTable *table) {
+    if (!node) return;
+
+    switch (node->type) {
+        case AST_PROGRAM:
+        case AST_BLOCK:
+            // New block: push scope
+            enter_scope(table);
+            analyze_scope(node->left, table);
+            analyze_scope(node->right, table);
+            // End block: pop scope
+            exit_scope(table);
+            break;
+        case AST_VARDECL:
+            // Process variable declaration
+            if (!add_symbol(table, node->token.lexeme, /*type*/ 0, node->token.line)) {
+                // Handle error if needed
+            }
+            break;
+        case AST_ASSIGN:
+            // For assignments, check if the variable exists
+            if (!lookup_symbol(table, node->left->token.lexeme)) {
+                semantic_error(SEM_ERROR_UNDECLARED_VARIABLE, node->left->token.lexeme, node->left->token.line);
+            }
+            break;
+        // Process other AST node types recursively
+        default:
+            analyze_scope(node->left, table);
+            analyze_scope(node->right, table);
+            break;
     }
 }
 
