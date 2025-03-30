@@ -82,18 +82,10 @@ void enter_scope(SymbolTable* table){
     table->current_scope = (table->current_scope + 1);
 }
 
-// Exit the current scope
-// Decrements the current scope level when leaving a block
-// Optionally removes symbols that are no longer in scope
-void exit_scope(SymbolTable* table){
-    remove_symbols_in_current_scope(table);
-    table->current_scope = (table->current_scope) - 1;
-}
-
 // Remove symbols from the current scope
 // Cleans up symbols that are no longer accessible after leaving a scope
 void remove_symbols_in_current_scope(SymbolTable* table){
-    
+
     Symbol *prev;
     Symbol *curr;
     Symbol *next;
@@ -143,6 +135,16 @@ void remove_symbols_in_current_scope(SymbolTable* table){
         free(curr);
     }
 }
+
+
+// Exit the current scope
+// Decrements the current scope level when leaving a block
+// Optionally removes symbols that are no longer in scope
+void exit_scope(SymbolTable* table){
+    remove_symbols_in_current_scope(table);
+    table->current_scope = (table->current_scope) - 1;
+}
+
 
 void analyze_scope(ASTNode *node, SymbolTable *table) {
     if (!node) return;

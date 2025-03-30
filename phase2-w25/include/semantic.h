@@ -1,5 +1,5 @@
 #ifndef SEMANTIC_H
-#define DEMANTIC_H
+#define SEMANTIC_H
 
 // Basic symbol structure
 typedef struct Symbol {
