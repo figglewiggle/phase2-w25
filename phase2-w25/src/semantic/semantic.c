@@ -382,7 +382,7 @@ int check_block(ASTNode* node, SymbolTable* table){
 
 // Check a condition (e.g., in if statements)
 int check_condition(ASTNode* node, SymbolTable* table){
-    if (node->type != AST_IF || node->type != AST_WHILE || node->type != AST_REPEAT) {
+    if (node->type != AST_IF && node->type != AST_WHILE && node->type != AST_REPEAT) {
         return 0;
     }
     
