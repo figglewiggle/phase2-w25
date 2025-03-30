@@ -189,6 +189,58 @@ int analyze_semantics(ASTNode* ast) {
     return result;
 }
 
+// Check program node
+int check_program(ASTNode* node, SymbolTable* table) {
+    if (!node) return 1;
+    
+    int result = 1;
+    
+    if (node->type == AST_PROGRAM) {
+        // Check left child (statement)
+        if (node->left) {
+            result = check_statement(node->left, table) && result;
+        }
+        
+        // Check right child (rest of program)
+        if (node->right) {
+            result = check_program(node->right, table) && result;
+        }
+    }
+    
+    return result;
+}
+
+
+int check_statement(ASTNode* node, SymbolTable* table) {
+    // Null nodes are valid
+    if (node == NULL) {
+        return 1; // Empty node is valid
+    }
+    
+    switch (node->type) {
+        case AST_VARDECL:
+            return check_declaration(node, table);
+        case AST_ASSIGN:
+            return check_assignment(node, table);
+        case AST_PRINT:
+            return check_expression(node->left, table);
+        case AST_IF:
+            // Check condition and branch
+            return check_condition(node->left, table) && check_statement(node->right, table);
+        case AST_WHILE:
+            // Check condition and branch
+            return check_condition(node->left, table) && check_statement(node->right, table);
+        case AST_BLOCK:
+            return check_block(node, table);
+        case AST_REPEAT:
+            // Check statement and condition
+            return check_statement(node->left, table) && check_condition(node->right, table);
+        default:
+            semantic_error(SEM_ERROR_INVALID_OPERATION, node->token.lexeme, node->token.line);
+            return 0; // Unknown statement type
+    }
+}
+
 
 int check_declaration(ASTNode* node, SymbolTable* table) {
     // Check if the given node is a variable declaration
