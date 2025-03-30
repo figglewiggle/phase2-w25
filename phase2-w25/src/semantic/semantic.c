@@ -63,6 +63,19 @@ Symbol* lookup_symbol(SymbolTable* table, const char* name){
     return NULL;
 }
 
+// Look up symbol in current scope only
+Symbol* lookup_symbol_current_scope(SymbolTable* table, const char* name) {
+    Symbol* current = table->head;
+    while (current) {
+        if (strcmp(current->name, name) == 0 && 
+            current->scope_level == table->current_scope) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
 // Enter a new scope level
 // Increments the current scope level when entering a block (e.g., if, while)
 void enter_scope(SymbolTable* table){
@@ -146,7 +159,7 @@ void analyze_scope(ASTNode *node, SymbolTable *table) {
             break;
         case AST_VARDECL:
             // Process variable declaration
-            if (!add_symbol(table, node->token.lexeme, /*type*/ 0, node->token.line)) {
+            if (!add_symbol(table, node->token.lexeme, TOKEN_INT, node->token.line)) {
                 // Handle error if needed
             }
             break;
@@ -180,4 +193,111 @@ void free_symbol_table(SymbolTable* table){
 
     // Clear the table itself
     free(table);
+}
+
+
+// Analyze AST semantically
+int analyze_semantics(ASTNode* ast) {
+    SymbolTable* table = init_symbol_table();
+    int result = check_program(ast, table);
+    free_symbol_table(table);
+    return result;
+}
+
+
+int check_declaration(ASTNode* node, SymbolTable* table) {
+    // Check if the given node is a variable declaration
+    if (node->type = AST_VARDECL) {
+        return 0;
+    }
+
+    // Get variable name
+    const char* name = node->token.lexeme;
+    // Check if variable with same name already exists in the current scope
+    // If it does, report a redeclaration error
+    Symbol* symbol = lookup_symbol_current_scope(table, name);
+    if (symbol) {
+        semantic_error(SEM_ERROR_REDECLARED_VARIABLE, name, line);
+        return 0;
+    }
+    
+    // Add the new variable to the symbol table
+    add_symbol(table, node->token.lexeme, TOKEN_INT, node->token.line);
+    return 1;
+
+}
+
+// Check assignment node
+int check_assignment(ASTNode* node, SymbolTable* table) {
+    if (node->type != AST_ASSIGN || !node->left || !node->right) {
+        return 0;
+    }
+    
+    const char* name = node->left->token.lexeme;
+    
+    // Check if variable exists
+    Symbol* symbol = lookup_symbol(table, name);
+    if (!symbol) {
+        semantic_error(SEM_ERROR_UNDECLARED_VARIABLE, name, node->token.line);
+        return 0;
+    }
+    
+    // Check expression
+    int expr_valid = check_expression(node->right, table);
+    
+    // Mark as initialized
+    if (expr_valid) {
+        symbol->is_initialized = 1;
+    }
+    
+    return expr_valid;
+}
+
+// Check an expression for type correctness
+int check_expression(ASTNode* node, SymbolTable* table){
+    // empty node is invalid expression
+    if (node == NULL) {
+        return 0; 
+    }
+
+    switch (node->type) {
+        // Numbers are valid expressions
+        case AST_NUMBER:
+            return TOKEN_INT;
+        // Identifiers are valid expressions if they are declared
+        case AST_IDENTIFIER: {
+            // Check if variable has already been declared
+            Symbol* symbol = lookup_symbol(table, node->token.lexeme);
+            if (!symbol) {
+                semantic_error(SEM_ERROR_UNDECLARED_VARIABLE, node->token.lexeme, node->token.line);
+                return 0;
+            }
+            // Check if variable has not been previously initialized
+            else if (!symbol->is_initialized) {
+                semantic_error(SEM_ERROR_UNINITIALIZED_VARIABLE, node->token.lexeme, node->token.line);
+                return 0; 
+            }
+            else {
+                // Return the type of the expression
+                return symbol->type;
+            }
+        }
+        case AST_BINOP:
+            // recursively check left and right expressions
+            int left_valid = check_expression(node->left, table);
+            int right_valid = check_expression(node->right, table);
+            // Check if left and right side of the binary operation are valid
+            if (left_valid == 0 || right_valid == 0) {
+                return 0; 
+            } 
+            if (left_valid != right_valid) {
+                semantic_error(SEM_ERROR_TYPE_MISMATCH, node->token.lexeme, node->token.line);
+                return 0; 
+            }
+            // Return the type of the expression
+            return left_valid; 
+        default:
+            semantic_error(SEM_ERROR_INVALID_OPERATION, node->token.lexeme, node->token.line);
+            return 0;
+    }
 }
