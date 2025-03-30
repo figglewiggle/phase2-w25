@@ -394,7 +394,7 @@ int check_condition(ASTNode* node, SymbolTable* table){
         return 0; 
     }
 
-    // coniditions must be an integer
+    // conditions must be an integer
     if (result != TOKEN_INT) {
         semantic_error(SEM_ERROR_TYPE_MISMATCH, node->token.lexeme, node->token.line);
         return 0; 

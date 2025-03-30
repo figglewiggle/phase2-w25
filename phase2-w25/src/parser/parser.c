@@ -600,90 +600,90 @@ void test_case_1(void);
 void test_case_2(void);
 
 // Main function for testing
-int main()
-{
-    // Test with both valid and invalid inputs
-    const char *input = "int x;\n"   // Valid declaration
-                        "x = 42;\n" // Valid assignment;
-
-                        // comment and uncomment out these lines at will
-                        // to see how valid and invalid output proceed
-                        "if (x <= 42) {\n"
-                        "   y = 5;\n"
-                        "   z = 6;\n"
-                        "}\n"
-                        "while (y == 5) {\n"
-                        "   y = 6;\n"
-                        "   x = z;\n"
-                        "}\n"
-                        "repeat {\n"
-                        "   y = y + 2;\n"
-                        "   x = x + 3;\n"
-                        "} until (x > 10) \n";
-    //"a = factorial(z - 1);\n"
-    //"y = (x + 2) * 3;\n";
-
-
-
-    // TODO 8: Add more test cases and read from a file:
-    /*
-    const char *invalid_input = "int x;\n"
-                                "x = 42;\n"
-                                "int x;\n"
-                                "x = 42;"
-                                "if x == 42) {"
-                                "y = 5y;"
-                                "z = 6"
-                                "}"
-                                "int ;";
-*/
-    printf("Parsing input:\n%s\n", input);
-    parser_init(input);
-    ASTNode *ast = parse();
-
-    printf("\nAbstract Syntax Tree:\n");
-    print_ast(ast, 0);
-
-    // New: Perform semantic analysis after AST is created
-    printf("\nPerforming Semantic Analysis...\n");
-    int semanticResult = analyze_semantics(ast);
-    if (semanticResult) {
-        printf("Semantic analysis successful. No errors found.\n");
-    } else {
-        printf("Semantic analysis failed. Errors detected.\n");
-    }
-
-    free_ast(ast);
-
-    test_case_1();
-    test_case_2();
-    return 0;
-}
-
-void test_case_1(void) {
-    // Valid case
-    printf("\nTest case 1:\n");
-    const char *input = "int x;\n x = 10;\n print x; if (x > 4) { x = 5; }";
-    printf("Parsing input:\n%s\n", input);
-    parser_init(input);
-    ASTNode *ast = parse();
-
-    printf("\nAbstract Syntax Tree:\n");
-    print_ast(ast, 0);
-
-    free_ast(ast);
-}
-
-void test_case_2(void) {
-    // Invalid case
-    printf("\nTest case 2:\n");
-    const char *input = "int x; print x + ;";
-    printf("Parsing input:\n%s\n", input);
-    parser_init(input);
-    ASTNode *ast = parse();
-
-    printf("\nAbstract Syntax Tree:\n");
-    print_ast(ast, 0);
-
-    free_ast(ast);
-}
+// int main()
+// {
+//     // Test with both valid and invalid inputs
+//     const char *input = "int x;\n"   // Valid declaration
+//                         "x = 42;\n" // Valid assignment;
+//
+//                         // comment and uncomment out these lines at will
+//                         // to see how valid and invalid output proceed
+//                         "if (x <= 42) {\n"
+//                         "   y = 5;\n"
+//                         "   z = 6;\n"
+//                         "}\n"
+//                         "while (y == 5) {\n"
+//                         "   y = 6;\n"
+//                         "   x = z;\n"
+//                         "}\n"
+//                         "repeat {\n"
+//                         "   y = y + 2;\n"
+//                         "   x = x + 3;\n"
+//                         "} until (x > 10) \n";
+//     //"a = factorial(z - 1);\n"
+//     //"y = (x + 2) * 3;\n";
+//
+//
+//
+//     // TODO 8: Add more test cases and read from a file:
+//     /*
+//     const char *invalid_input = "int x;\n"
+//                                 "x = 42;\n"
+//                                 "int x;\n"
+//                                 "x = 42;"
+//                                 "if x == 42) {"
+//                                 "y = 5y;"
+//                                 "z = 6"
+//                                 "}"
+//                                 "int ;";
+// */
+//     printf("Parsing input:\n%s\n", input);
+//     parser_init(input);
+//     ASTNode *ast = parse();
+//
+//     printf("\nAbstract Syntax Tree:\n");
+//     print_ast(ast, 0);
+//
+//     // New: Perform semantic analysis after AST is created
+//     printf("\nPerforming Semantic Analysis...\n");
+//     int semanticResult = analyze_semantics(ast);
+//     if (semanticResult) {
+//         printf("Semantic analysis successful. No errors found.\n");
+//     } else {
+//         printf("Semantic analysis failed. Errors detected.\n");
+//     }
+//
+//     free_ast(ast);
+//
+//     test_case_1();
+//     test_case_2();
+//     return 0;
+// }
+//
+// void test_case_1(void) {
+//     // Valid case
+//     printf("\nTest case 1:\n");
+//     const char *input = "int x;\n x = 10;\n print x; if (x > 4) { x = 5; }";
+//     printf("Parsing input:\n%s\n", input);
+//     parser_init(input);
+//     ASTNode *ast = parse();
+//
+//     printf("\nAbstract Syntax Tree:\n");
+//     print_ast(ast, 0);
+//
+//     free_ast(ast);
+// }
+//
+// void test_case_2(void) {
+//     // Invalid case
+//     printf("\nTest case 2:\n");
+//     const char *input = "int x; print x + ;";
+//     printf("Parsing input:\n%s\n", input);
+//     parser_init(input);
+//     ASTNode *ast = parse();
+//
+//     printf("\nAbstract Syntax Tree:\n");
+//     print_ast(ast, 0);
+//
+//     free_ast(ast);
+// }
