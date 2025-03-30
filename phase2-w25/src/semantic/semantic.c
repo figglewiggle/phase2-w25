@@ -242,26 +242,24 @@ int check_statement(ASTNode* node, SymbolTable* table) {
 }
 
 
+// Check declaration node
 int check_declaration(ASTNode* node, SymbolTable* table) {
-    // Check if the given node is a variable declaration
-    if (node->type = AST_VARDECL) {
+    if (node->type != AST_VARDECL) {
         return 0;
     }
 
-    // Get variable name
     const char* name = node->token.lexeme;
-    // Check if variable with same name already exists in the current scope
-    // If it does, report a redeclaration error
-    Symbol* symbol = lookup_symbol_current_scope(table, name);
-    if (symbol) {
-        semantic_error(SEM_ERROR_REDECLARED_VARIABLE, name, line);
+
+    // Check if variable already declared in current scope
+    Symbol* existing = lookup_symbol_current_scope(table, name);
+    if (existing) {
+        semantic_error(SEM_ERROR_REDECLARED_VARIABLE, name, node->token.line);
         return 0;
     }
-    
-    // Add the new variable to the symbol table
-    add_symbol(table, node->token.lexeme, TOKEN_INT, node->token.line);
-    return 1;
 
+    // Add to symbol table
+    add_symbol(table, name, TOKEN_INT, node->token.line);
+    return 1;
 }
 
 // Check assignment node
