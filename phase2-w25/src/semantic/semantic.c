@@ -6,6 +6,7 @@
 #include "../../include/tokens.h"
 #include "../../include/semantic.h"
 
+
 // Initialize a new symbol table
 // Creates an empty symbol table structure with scope level set to 0
 SymbolTable* init_symbol_table() {
@@ -17,50 +18,30 @@ SymbolTable* init_symbol_table() {
     return table;
 }
 
+// Add symbol to table
+void add_symbol(SymbolTable* table, const char* name, int type, int line) {
+    Symbol* symbol = malloc(sizeof(Symbol));
+    if (symbol) {
+        strcpy(symbol->name, name);
+        symbol->type = type;
+        symbol->scope_level = table->current_scope;
+        symbol->line_declared = line;
+        symbol->is_initialized = 0;
 
-// Add a symbol to the table
-// Inserts a new variable with given name, type, and line number into the current scope
-Symbol* add_symbol(SymbolTable* table, const char* name, int type, int line){
-
-    // Check for redeclaration in the current scope
-    Symbol *curr = table->head;
-    while (curr) {
-        if (strcmp(curr->name, name) == 0 && curr->scope_level == table->current_scope) {
-            semantic_error(SEM_ERROR_REDECLARED_VARIABLE, name, line);
-            return NULL; // Or handle the error appropriately
-        }
-        curr = curr->next;
+        // Add to beginning of list
+        symbol->next = table->head;
+        table->head = symbol;
     }
-
-    // Create and initialize new symbol
-    Symbol *new_symbol = malloc(sizeof(Symbol));
-    if (new_symbol) {
-        strcpy(new_symbol->name, name);
-        new_symbol->type = type;
-        new_symbol->line_declared = line;
-        new_symbol->scope_level = table->current_scope; // Set current scope level
-        new_symbol->is_initialized = 0;
-        new_symbol->next = NULL;
-    }
-
-    // Insert at the beginning of the list (for easier shadowing lookup)
-    new_symbol->next = table->head;
-    table->head = new_symbol;
-
-    return new_symbol;
 }
 
-// Look up a symbol in the table
-// Searches for a variable by name across all accessible scopes
-// Returns the symbol if found, NULL otherwise
-Symbol* lookup_symbol(SymbolTable* table, const char* name){
-    
-    Symbol *curr = table->head;
-    while (curr) {
-        if (strcmp(curr->name, name) == 0) {
-            return curr;
+// Look up symbol by name
+Symbol* lookup_symbol(SymbolTable* table, const char* name) {
+    Symbol* current = table->head;
+    while (current) {
+        if (strcmp(current->name, name) == 0) {
+            return current;
         }
-        curr = curr->next;
+        current = current->next;
     }
     return NULL;
 }
@@ -69,7 +50,7 @@ Symbol* lookup_symbol(SymbolTable* table, const char* name){
 Symbol* lookup_symbol_current_scope(SymbolTable* table, const char* name) {
     Symbol* current = table->head;
     while (current) {
-        if (strcmp(current->name, name) == 0 && 
+        if (strcmp(current->name, name) == 0 &&
             current->scope_level == table->current_scope) {
             return current;
         }
