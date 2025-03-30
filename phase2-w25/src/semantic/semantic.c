@@ -302,3 +302,9 @@ int check_expression(ASTNode* node, SymbolTable* table){
             return 0;
     }
 }
+
+// Check a block of statements, handling scope
+int check_block(ASTNode* node, SymbolTable* table);
+
+// Check a condition (e.g., in if statements)
+int check_condition(ASTNode* node, SymbolTable* table);
