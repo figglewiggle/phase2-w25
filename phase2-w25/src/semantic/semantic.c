@@ -338,10 +338,47 @@ int check_expression(ASTNode* node, SymbolTable* table){
 }
 
 // Check a block of statements, handling scope
-int check_block(ASTNode* node, SymbolTable* table);
+int check_block(ASTNode* node, SymbolTable* table){
+    if (node->type != AST_BLOCK) {
+        return 0;
+    }
+    
+    // Enter new scope
+    enter_scope(table);
+    
+    // Left side: check the first statement in the block
+    // Right side: check the rest of the block
+    int result = check_statement(node->left, table) && check_block(node->right, table);
+    
+    // Exit scope
+    exit_scope(table);
+    
+    return result;
+}
 
 // Check a condition (e.g., in if statements)
-int check_condition(ASTNode* node, SymbolTable* table);
+int check_condition(ASTNode* node, SymbolTable* table){
+    if (node->type != AST_IF || node->type != AST_WHILE || node->type != AST_REPEAT) {
+        return 0;
+    }
+    
+    // Check the condition expression
+    int result = check_expression(node, table);
+    
+    // s if the expression is valid
+    if (result == 0) {
+        return 0; 
+    }
+
+    // coniditions must be an integer
+    if (result != TOKEN_INT) {
+        semantic_error(SEM_ERROR_TYPE_MISMATCH, node->token.lexeme, node->token.line);
+        return 0; 
+    }
+    
+    return 1;
+}
+
 
 
 int main() {
@@ -375,3 +412,4 @@ int main() {
 
     return 0;
 }
+
