@@ -342,3 +342,36 @@ int check_block(ASTNode* node, SymbolTable* table);
 
 // Check a condition (e.g., in if statements)
 int check_condition(ASTNode* node, SymbolTable* table);
+
+
+int main() {
+    const char* input = "int x;\n"
+                        "x = 42;\n"
+                        "if (x > 0) {\n"
+                        "    int y;\n"
+                        "    y = x + 10;\n"
+                        "    print y;\n"
+                        "}\n";
+
+    printf("Analyzing input:\n%s\n\n", input);
+
+    // Lexical analysis and parsing
+    parser_init(input);
+    ASTNode* ast = parse();
+
+    printf("AST created. Performing semantic analysis...\n\n");
+
+    // Semantic analysis
+    int result = analyze_semantics(ast);
+
+    if (result) {
+        printf("Semantic analysis successful. No errors found.\n");
+    } else {
+        printf("Semantic analysis failed. Errors detected.\n");
+    }
+
+    // Clean up
+    free_ast(ast);
+
+    return 0;
+}
