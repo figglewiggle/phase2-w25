@@ -7,6 +7,30 @@
 #include "../../include/semantic.h"
 
 
+void semantic_error(SemanticErrorType error, const char* name, int line) {
+    printf("Semantic Error at line %d: ", line);
+    
+    switch (error) {
+        case SEM_ERROR_UNDECLARED_VARIABLE:
+            printf("Undeclared variable '%s'\n", name);
+            break;
+        case SEM_ERROR_REDECLARED_VARIABLE:
+            printf("Variable '%s' already declared in this scope\n", name);
+            break;
+        case SEM_ERROR_TYPE_MISMATCH:
+            printf("Type mismatch involving '%s'\n", name);
+            break;
+        case SEM_ERROR_UNINITIALIZED_VARIABLE:
+            printf("Variable '%s' may be used uninitialized\n", name);
+            break;
+        case SEM_ERROR_INVALID_OPERATION:
+            printf("Invalid operation involving '%s'\n", name);
+            break;
+        default:
+            printf("Unknown semantic error with '%s'\n", name);
+    }
+}
+
 // Initialize a new symbol table
 // Creates an empty symbol table structure with scope level set to 0
 SymbolTable* init_symbol_table() {
