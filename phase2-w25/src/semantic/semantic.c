@@ -8,12 +8,15 @@
 
 // Initialize a new symbol table
 // Creates an empty symbol table structure with scope level set to 0
-SymbolTable* init_symbol_table(){
-    SymbolTable *table = malloc(sizeof(SymbolTable));
-    table->head = NULL;
-    table->current_scope = 0;
+SymbolTable* init_symbol_table() {
+    SymbolTable* table = malloc(sizeof(SymbolTable));
+    if (table) {
+        table->head = NULL;
+        table->current_scope = 0;
+    }
     return table;
 }
+
 
 // Add a symbol to the table
 // Inserts a new variable with given name, type, and line number into the current scope
