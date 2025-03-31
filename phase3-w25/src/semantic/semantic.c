@@ -314,6 +314,18 @@ int check_expression(ASTNode* node, SymbolTable* table){
             }
             // Return the type of the expression
             return left_valid; 
+        case AST_FACTORIAL:
+            // Check if the factorial expression is valid
+            int is_int = check_expression(node->left, table);
+
+            // Expression should be an integer
+            if (is_int != TOKEN_INT) {
+                semantic_error(SEM_ERROR_TYPE_MISMATCH, node->token.lexeme, node->token.line);
+                return 0; 
+            }
+
+            // Factorial should return an integer
+            return TOKEN_INT;
         default:
             semantic_error(SEM_ERROR_INVALID_OPERATION, node->token.lexeme, node->token.line);
             return 0;
