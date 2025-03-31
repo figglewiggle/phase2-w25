@@ -92,7 +92,6 @@ void enter_scope(SymbolTable* table){
 // Remove symbols from the current scope
 // Cleans up symbols that are no longer accessible after leaving a scope
 void remove_symbols_in_current_scope(SymbolTable* table){
-
     Symbol *prev;
     Symbol *curr;
     Symbol *next;
@@ -157,7 +156,6 @@ void exit_scope(SymbolTable* table){
 // Free the symbol table memory
 // Releases all allocated memory when the symbol table is no longer needed
 void free_symbol_table(SymbolTable* table){
-
     Symbol *curr = table->head;
     Symbol *next;
 
@@ -331,24 +329,25 @@ int check_assignment(ASTNode* node, SymbolTable* table) {
 
 // Check a condition (e.g., in if statements)
 int check_condition(ASTNode* node, SymbolTable* table){
-    if (node->type != AST_IF && node->type != AST_WHILE && node->type != AST_REPEAT) {
+    // Null node is invalid
+    if (node == NULL) {
         return 0;
     }
-    
+
     // Check the condition expression
     int result = check_expression(node, table);
-    
+
     // s if the expression is valid
     if (result == 0) {
-        return 0; 
+        return 0;
     }
 
     // conditions must be an integer
     if (result != TOKEN_INT) {
         semantic_error(SEM_ERROR_TYPE_MISMATCH, node->token.lexeme, node->token.line);
-        return 0; 
+        return 0;
     }
-    
+
     return 1;
 }
 
@@ -381,11 +380,15 @@ int main() {
                         "    print y;\n"
                         "}\n";
 
+    parser_init(input);
+    ASTNode *ast = parse();
+    //
+    // printf("\nAbstract Syntax Tree:\n");
+    // print_ast(ast, 0);
+
     printf("Analyzing input:\n%s\n\n", input);
 
     // Lexical analysis and parsing
-    parser_init(input);
-    ASTNode* ast = parse();
 
     printf("AST created. Performing semantic analysis...\n\n");
 
@@ -403,4 +406,3 @@ int main() {
 
     return 0;
 }
-
