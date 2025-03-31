@@ -1,7 +1,7 @@
 
 # Semantic Anaylzer
 
-This semantic analyzer uses the abstract syntax tree created by the parser. The semantic analyzer semantically checks if the code is correct according to the rules of the language. Checks if variables are declarted, if types of variable are compatiable and if variable are used within their correct scope.
+This semantic analyzer uses the abstract syntax tree created by the parser. The semantic analyzer semantically checks if the code is correct according to the rules of the language. Checks if variables are declarted, if types of variable are compatiable and if variables are used within their correct scope.
 
 # Parser
 
