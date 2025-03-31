@@ -1,1 +1,25 @@
+Invalid test case:
+Parsing input:
+x = 42;
+if (x > 0) {
+    int y;
+    y = z + 10;
+    print y;
+}
 
+Analyzing input:
+x = 42;
+if (x > 0) {
+    int y;
+    y = z + 10;
+    print y;
+}
+
+
+AST created. Performing semantic analysis...
+
+Semantic Error at line 1: Undeclared variable 'x'
+Semantic Error at line 2: Undeclared variable 'x'
+Semantic Error at line 4: Undeclared variable 'z'
+Semantic Error at line 5: Variable 'y' may be used uninitialized
+Semantic analysis failed. Errors detected.

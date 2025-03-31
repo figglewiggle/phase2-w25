@@ -1,1 +1,24 @@
+Valid test case:
+Parsing input:
+int x;
+x = 42;
+if (x > 0) {
+    int y;
+    y = x + 10;
+    print y;
+}
 
+Parse Error at line 11, column 10: Missing semicolon after '+'
+Analyzing input:
+int x;
+x = 42;
+if (x > 0) {
+    int y;
+    y = x + 10;
+    print y;
+}
+
+
+AST created. Performing semantic analysis...
+
+Semantic analysis successful. No errors found.
