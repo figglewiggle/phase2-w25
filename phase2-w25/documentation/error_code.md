@@ -1,33 +1,58 @@
-# Parser Error Handling
+## Error Codes
 
-Parser handles various syntax errors through different error codes.
-For error handling, when the parser encounters an error, it will immediately stop parsing the input, and generate an error message for the user and then exit.
-Each error message is printed along with the line and column number of the token where the error was detected to help with debugging and error recovery.
+### Lexical Errors
+- **`ERROR_INVALID_CHAR`**  
+  Raised when an invalid character is encountered in the input.
 
-## PARSE_ERROR_UNEXPECTED_TOKEN
-- When parser encounters a token that does not match the expected typ.
+- **`ERROR_INVALID_NUMBER`**  
+  Raised for invalid number formats.
 
-## PARSE_ERROR_MISSING_SEMICOLON
-- When semicolon is expected at the end of a statement, but missing
+- **`ERROR_CONSECUTIVE_OPERATORS`**  
+  Raised when consecutive operators are found without operands.
 
-## PARSE_ERROR_MISSING_IDENTIFIER
-- When identifier is expected, but missing
+- **`ERROR_INVALID_IDENTIFIER`**  
+  Raised for invalid variable names.
 
-## PARSE_ERROR_MISSING_EQUALS
-- When equals is missing in an assigment statement
+### Parser Errors
+- **`PARSE_ERROR_UNEXPECTED_TOKEN`**  
+  Raised when the parser encounters an unexpected token.
 
-## PARSE_ERROR_INVALID_EXPRESSION
-- When expression can not be parsed
+- **`PARSE_ERROR_MISSING_SEMICOLON`**  
+  Raised when a semicolon is missing at the end of a statement.
 
-## PARSE_ERROR_MISSING_PARENTHESIS
-- When parenthesis is expected, but missing
+- **`PARSE_ERROR_MISSING_IDENTIFIER`**  
+  Raised when an identifier is expected but missing.
 
-## PARSE_ERROR_BAD_PARENTHESIS
-- When there is a mismatch of parenthesis 
+- **`PARSE_ERROR_MISSING_EQUALS`**  
+  Raised when an equals sign is missing in an assignment.
 
-## PARSE_ERROR_MISSING_BLOCK
-- When code which is expected to be enclosed in braces, but braces are missing
+- **`PARSE_ERROR_INVALID_EXPRESSION`**  
+  Raised when an expression cannot be parsed.
 
-## PARSE_ERROR_MISSING_UNTILS
-- When `repeat-until` loop is missing `until` keyword is missing after statement block
+- **`PARSE_ERROR_MISSING_PARENTHESIS`**  
+  Raised when a parenthesis is expected but missing.
 
+- **`PARSE_ERROR_BAD_PARENTHESIS`**  
+  Raised for mismatched parentheses.
+
+- **`PARSE_ERROR_MISSING_BLOCK`**  
+  Raised when a block of code is missing braces.
+
+- **`PARSE_ERROR_MISSING_UNTILS`**  
+  Raised when the `until` keyword is missing in a repeat-until loop.
+
+### Semantic Errors
+- **`SEM_ERROR_UNDECLARED_VARIABLE`**  
+  Raised when a variable is used without being declared.
+
+- **`SEM_ERROR_REDECLARED_VARIABLE`**  
+  Raised when a variable is redeclared in the same scope.
+
+- **`SEM_ERROR_TYPE_MISMATCH`**  
+  Raised for type mismatches in expressions or assignments.
+
+- **`SEM_ERROR_UNINITIALIZED_VARIABLE`**  
+  Raised when an uninitialized variable is used.
+
+- **`SEM_ERROR_INVALID_OPERATION`**  
+  Raised for invalid operations, such as unsupported binary operations.
