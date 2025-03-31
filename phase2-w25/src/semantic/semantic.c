@@ -184,17 +184,36 @@ int check_statement(ASTNode* node, SymbolTable* table) {
             return check_assignment(node, table);
         case AST_PRINT:
             return check_expression(node->left, table);
-        case AST_IF:
-            // Check condition and branch
-                return check_condition(node->left, table) && check_statement(node->right, table);
-        case AST_WHILE:
-            // Check condition and branch
-                return check_condition(node->left, table) && check_statement(node->right, table);
-        case AST_BLOCK:
-            return check_block(node, table);
-        case AST_REPEAT:
+        case AST_IF: {
+            int condition_result = check_condition(node->left, table);
+            int branch_result = check_statement(node->right, table);
+            return condition_result && branch_result;
+        }
+        case AST_WHILE:{
+            int condition_result = check_condition(node->left, table);
+            int branch_result = check_statement(node->right, table);
+            return condition_result && branch_result;
+        }
+        case AST_BLOCK: {
+            int left_result = 1;
+            if (node->left) {
+                left_result = check_statement(node->left, table);
+            }
+
+            int right_result = 1;
+            if (node->left) {
+                right_result = check_statement(node->right, table);
+            }
+
+            return left_result && right_result;
+
+        }
+        case AST_REPEAT: {
             // Check statement and condition
-                return check_statement(node->left, table) && check_condition(node->right, table);
+            int statement_result = check_statement(node->left, table);
+            int condition_result = check_condition(node->right, table);
+            return statement_result && condition_result;
+        }
         default:
             semantic_error(SEM_ERROR_INVALID_OPERATION, node->token.lexeme, node->token.line);
         return 0; // Unknown statement type
@@ -353,6 +372,10 @@ int check_condition(ASTNode* node, SymbolTable* table){
 
 // Check a block of statements, handling scope
 int check_block(ASTNode* node, SymbolTable* table){
+    // Added null check to end recursion
+    if (node == NULL) {
+        return 1;
+    }
     if (node->type != AST_BLOCK) {
         return 0;
     }
@@ -370,8 +393,7 @@ int check_block(ASTNode* node, SymbolTable* table){
     return result;
 }
 
-
-int main() {
+void test_case_valid() {
     const char* input = "int x;\n"
                         "x = 42;\n"
                         "if (x > 0) {\n"
@@ -380,6 +402,41 @@ int main() {
                         "    print y;\n"
                         "}\n";
 
+    printf("Parsing input:\n%s\n", input);
+    parser_init(input);
+    ASTNode *ast = parse();
+    //
+    // printf("\nAbstract Syntax Tree:\n");
+    // print_ast(ast, 0);
+
+    printf("Analyzing input:\n%s\n\n", input);
+
+    // Lexical analysis and parsing
+
+    printf("AST created. Performing semantic analysis...\n\n");
+
+    // Semantic analysis
+    int result = analyze_semantics(ast);
+
+    if (result) {
+        printf("Semantic analysis successful. No errors found.\n");
+    } else {
+        printf("Semantic analysis failed. Errors detected.\n");
+    }
+
+    // Clean up
+    free_ast(ast);
+}
+
+void test_case_invalid() {
+    const char* input = "x = 42;\n"
+                        "if (x > 0) {\n"
+                        "    int y;\n"
+                        "    y = z + 10;\n"
+                        "    print y;\n"
+                        "}\n";
+
+    printf("Parsing input:\n%s\n", input);
     parser_init(input);
     ASTNode *ast = parse();
     //
@@ -404,5 +461,12 @@ int main() {
     // Clean up
     free_ast(ast);
 
-    return 0;
+}
+
+int main() {
+    printf("Invalid test case:\n");
+    test_case_invalid();
+
+    printf("\n\n\n\n\nValid test case:\n");
+    test_case_valid();
 }
