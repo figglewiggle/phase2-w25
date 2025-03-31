@@ -70,3 +70,23 @@ This parser creates an abstract syntax tree, from a stream of tokens generated b
 
 - **`check_condition`**  
   Validates conditions in control statements like if and while.
+
+  ### Semantic Checking Rules
+
+- **Declaration & Usage:**  
+  Every variable must be declared before use. The symbol table records each variable’s name, type, scope, and initialization status.
+
+- **Redeclaration & Shadowing:**  
+  Redeclaring a variable in the same scope is an error; inner scopes may redeclare (shadow) outer variables.
+
+- **Initialization & Type Checking:**  
+  Variables must be initialized before use, and all expressions must use type-compatible operands.
+
+- **Scope Management:**  
+  Each block (e.g., in if, while, or explicit blocks) creates a new scope. Functions like `enter_scope()` and `exit_scope()` ensure that variables are only accessible within their valid scope.
+
+- **Control Structures:**  
+  Conditions in control statements are validated for semantic correctness.
+
+- **Error Reporting:**  
+  Descriptive errors (including variable names and line numbers) are generated for any semantic violations.
