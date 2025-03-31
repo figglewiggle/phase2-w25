@@ -153,38 +153,6 @@ void exit_scope(SymbolTable* table){
 }
 
 
-void analyze_scope(ASTNode *node, SymbolTable *table) {
-    if (!node) return;
-
-    switch (node->type) {
-        case AST_PROGRAM:
-        case AST_BLOCK:
-            // New block: push scope
-            enter_scope(table);
-            analyze_scope(node->left, table);
-            analyze_scope(node->right, table);
-            // End block: pop scope
-            exit_scope(table);
-            break;
-        case AST_VARDECL:
-            // Process variable declaration
-//            if (!add_symbol(table, node->token.lexeme, TOKEN_INT, node->token.line)) {
-//                // Handle error if needed
-//            }
-            break;
-        case AST_ASSIGN:
-            // For assignments, check if the variable exists
-            if (!lookup_symbol(table, node->left->token.lexeme)) {
-                semantic_error(SEM_ERROR_UNDECLARED_VARIABLE, node->left->token.lexeme, node->left->token.line);
-            }
-            break;
-        // Process other AST node types recursively
-        default:
-            analyze_scope(node->left, table);
-            analyze_scope(node->right, table);
-            break;
-    }
-}
 
 // Free the symbol table memory
 // Releases all allocated memory when the symbol table is no longer needed
