@@ -71,7 +71,7 @@ This parser creates an abstract syntax tree, from a stream of tokens generated b
 - **`check_condition`**  
   Validates conditions in control statements like if and while.
 
-  ### Semantic Checking Rules
+## Semantic Checking Rules
 
 - **Declaration & Usage:**  
   Every variable must be declared before use. The symbol table records each variable’s name, type, scope, and initialization status.
